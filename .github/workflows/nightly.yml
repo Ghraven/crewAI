@@ -12,6 +12,8 @@ concurrency:
 jobs:
   check:
     name: Check for new commits
+    # Fork maintenance must not attempt releases under upstream package names.
+    if: github.repository == 'crewAIInc/crewAI'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,7 +38,7 @@ jobs:
   build:
     name: Build nightly packages
     needs: check
-    if: needs.check.outputs.has_changes == 'true' || github.event_name == 'workflow_dispatch'
+    if: github.repository == 'crewAIInc/crewAI' && (needs.check.outputs.has_changes == 'true' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -94,6 +96,7 @@ jobs:
 
   publish:
     name: Publish nightly to PyPI
+    if: github.repository == 'crewAIInc/crewAI'
     needs: build
     runs-on: ubuntu-latest
     environment:
